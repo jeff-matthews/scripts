@@ -72,6 +72,7 @@ select yn in "Yes" "No"; do
     # extract tarball to web server directory
     # echo -e ${yellow} Deploying the latest tarball to the web server...
     # sudo tar -xvzf $file -C /home/affinipay/www/doc-site
+    #echo -e ${green}"Extraction complete!"
 
     break;;
 
