@@ -19,6 +19,18 @@ set -xv
 #   - Have access to the relevant AWS S3 buckets
 #   - Set up your AWS CLI environment (http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-set-up.html)
 
+echo Which branch do you want to deploy?
+  select branch in "master" "qa" "production"; do
+    case $branch in
+      master) master=s3://affinipay-qa/assets/dev-docs/master
+      break;;
+      qa) qa=s3://affinipay-qa/assets/dev-docs/qa
+      break;;
+      production) production=s3://affinipay-qa/assets/dev-docs/production
+      break;;
+    esac
+  done
+
 echo Do you want to deploy the latest build?
 select yn in "Yes" "No"; do
   case $yn in
@@ -26,7 +38,7 @@ select yn in "Yes" "No"; do
     echo Downloading the latest tarball from AWS S3...
 
     # find the latest tarball, print only the filename, and set as a variable
-    file=$(aws s3 ls s3://affinipay-qa/assets/dev-docs/master/ | sort -n | tail -1 | awk '{print $4}')
+    file=$(aws s3 ls $master/ | sort -n | tail -1 | awk '{print $4}')
 
     # download the file by passing the variable to the aws s3 cp command
     aws s3 cp s3://affinipay-qa/assets/dev-docs/master/$file .;
