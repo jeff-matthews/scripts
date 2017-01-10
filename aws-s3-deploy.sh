@@ -31,6 +31,7 @@ echo Which branch do you want to deploy?
       break;;
       production) production=s3://affinipay-qa/assets/dev-docs/production
       break;;
+      *) echo Invalid option! Enter 1, 2, or 3.
     esac
   done
 
@@ -74,7 +75,10 @@ select yn in "Yes" "No"; do
     else [ "$branch" = "production" ]
       aws s3 cp $production/$filename .;
     fi
-    
-    exit;;
+
+    break;;
+
+    *) echo Invalid option! Enter 1 or 2.
+
   esac
 done
