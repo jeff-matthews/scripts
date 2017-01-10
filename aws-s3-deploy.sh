@@ -12,7 +12,7 @@ ________                .__                     __________
 EOF
 
 # debugging
-set -xv
+# set -xv
 
 # To run this script, you must:
 #   - Sign up for an AWS S3 account
@@ -31,17 +31,28 @@ echo Which branch do you want to deploy?
     esac
   done
 
-echo Do you want to deploy the latest build?
+echo Do you want to deploy the latest build? If No, you must manually enter the filename associated with the tarball you want to deploy.
 select yn in "Yes" "No"; do
   case $yn in
     Yes)
     echo Downloading the latest tarball from AWS S3...
 
-    # find the latest tarball, print only the filename, and set as a variable
-    file=$(aws s3 ls $master/ | sort -n | tail -1 | awk '{print $4}')
-
-    # download the file by passing the variable to the aws s3 cp command
-    aws s3 cp s3://affinipay-qa/assets/dev-docs/master/$file .;
+    if [ "$branch" = "master" ]; then
+      # find the latest tarball, print only the filename, and set as a variable
+      file=$(aws s3 ls $master/ | sort -n | tail -1 | awk '{print $4}')
+      # download the file by passing the variable to the aws s3 cp command
+      aws s3 cp $master/$file .;
+    elif [ "$branch" = "qa" ]; then
+      # find the latest tarball, print only the filename, and set as a variable
+      file=$(aws s3 ls $qa/ | sort -n | tail -1 | awk '{print $4}')
+      # download the file by passing the variable to the aws s3 cp command
+      aws s3 cp $qa/$file .;
+    else [ "$branch" = "production" ]
+      # find the latest tarball, print only the filename, and set as a variable
+      file=$(aws s3 ls $production/ | sort -n | tail -1 | awk '{print $4}')
+      # download the file by passing the variable to the aws s3 cp command
+      aws s3 cp $production/$file .;
+    fi
 
     # extract tarball to web server directory
     # echo Deploying the latest tarball to the web server...
@@ -49,9 +60,7 @@ select yn in "Yes" "No"; do
     break;;
 
     No)
-    echo If No, you must manually enter the filename associated with the tarball you want to deploy.
-    echo Enter the filename of the tarball you want to deploy and press enter:
-    read filename
+    read -p "Enter the filename of the tarball you want to deploy and press enter: " filename
     # download the specified tarball
     aws s3 cp s3://affinipay-qa/assets/dev-docs/master/$filename .;
     exit;;
