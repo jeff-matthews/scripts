@@ -127,7 +127,7 @@ echo -e ${white}"Do you want to deploy?" ${cyan}
       if [ "$yn" = "No" ]; then
         # extract tarball to web server directory
         echo -e ${yellow}"Extracting build tarball to the web server directory..."
-        tar -xvzf $filename -C /Users/jeff/doc-site-test #/home/affinipay/www/doc-site
+        tar -xvzf $filename -C /home/affinipay/www/doc-site
         echo -e ${green}"Extraction complete!"
       else [ "$yn" = "Yes" ]
         # extract tarball to web server directory
