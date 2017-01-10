@@ -5,7 +5,7 @@ cat << "EOF"
 ________                .__                     __________
 \______ \   ____ ______ |  |   ____ ___.__. ____\______   \
  |   |   \_/ __ \\____ \|  |  /  _ <   |  |/ __ \|       _/
- |   `    \  ___/|  |_> >  |_(  <_> )___  \  ___/|    |   \
+ |   |    \  ___/|  |_> >  |_(  <_> )___  \  ___/|    |   \
 /_______  /\___  >   __/|____/\____// ____|\___  >____|_  /
         \/     \/|__|               \/         \/       \/
 
@@ -13,6 +13,9 @@ EOF
 
 # debugging
 # set -xv
+
+# set "fail on error" in bash
+set -e
 
 # To run this script, you must:
 #   - Sign up for an AWS S3 account
@@ -57,12 +60,21 @@ select yn in "Yes" "No"; do
     # extract tarball to web server directory
     # echo Deploying the latest tarball to the web server...
     # sudo tar -xvzf $file -C /home/affinipay/www/doc-site
+
     break;;
 
     No)
     read -p "Enter the filename of the tarball you want to deploy and press enter: " filename
-    # download the specified tarball
-    aws s3 cp s3://affinipay-qa/assets/dev-docs/master/$filename .;
+
+    if [ "$branch" = "master" ]; then
+      # download the specified tarball
+      aws s3 cp $master/$filename .;
+    elif [ "$branch" = "qa" ]; then
+      aws s3 cp $qa/$filename .;
+    else [ "$branch" = "production" ]
+      aws s3 cp $production/$filename .;
+    fi
+    
     exit;;
   esac
 done
