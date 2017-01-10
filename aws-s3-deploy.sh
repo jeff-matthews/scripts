@@ -12,7 +12,7 @@ ________                .__                     __________
 EOF
 
 # debugging
-set -xv
+#set -xv
 
 # set "fail on error" in bash
 set -e
@@ -77,8 +77,30 @@ select yn in "Yes" "No"; do
     break;;
 
     No)
-    echo -n -e ${white}"Enter the filename of the tarball you want to deploy and press [Enter]: "
-    read filename
+    echo -e ${white}"Do you want to see a list of tarball filenames for this branch?" ${cyan}
+    select list in "Yes" "No"; do
+      case $list in
+        Yes)
+        if [ "$branch" = "master" ]; then
+          # list tarball filenames in master
+          aws s3 ls $master/;
+        elif [ "$branch" = "qa" ]; then
+          # list tarball filenames in master
+          aws s3 ls $qa/;
+        else [ "$branch" = "production" ]
+          # list tarball filenames in master
+          aws s3 ls $production/;
+        fi
+        echo -n -e ${white}"Enter the filename of the tarball you want to deploy and press [Enter]: "
+        read filename
+        break;;
+        No)
+        echo -n -e ${white}"Enter the filename of the tarball you want to deploy and press [Enter]: "
+        read filename
+        break;;
+        *) echo -e ${red}"Invalid option! Enter 1 or 2."
+      esac
+    done
 
     if [ "$branch" = "master" ]; then
       # download the specified tarball
