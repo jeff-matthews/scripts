@@ -6,4 +6,5 @@ This page lists each script in this repo and a short description of what it does
 - **jekyll-gulp.js**: A typical Gulp file used to build a Jekyll static site. Includes HTML validation and minification.
 - **jekyll-rakefile.rb**: A typical Ruby makefile used to build a Jekyll static site. Includes HTML validation and minification.
 - **scrollspy.js**: Custom JS that uses jQuery to ensures h2 elements are formatted correctly so that the MaterializeCSS framework can display headings on a page and produce a scrollspy effect depending on scroll position.
-- **open-mobile-nav.js**: Custom JS that uses jQuery to show the TOC for API reference topics after clicking the mobile-nav hamburger menu
+- **open-mobile-nav.js**: Custom JS that uses jQuery to show the TOC for API reference topics after clicking the mobile-nav hamburger menu.
+- **prevent-default.js**: Custom JS that uses jQuery to prevent a page from refreshing when clicking on an active TOC link.
