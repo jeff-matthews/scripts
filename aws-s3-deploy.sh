@@ -1,5 +1,16 @@
 #!/bin/bash
 
+# This script automates the following steps:
+#   1. Prompt user to select a dev-docs S3 bucket (e.g., master, qa, production).
+#   2. Prompt user to select the latest tarball or other. If other, provides option to list tarballs  before prompting user to manually enter the filename.
+#   3. Download the tarball from the selected S3 bucket to the QA webserver
+#   4. Extract the tarball to the /home/affinipay/www/doc-site directory on the web server
+
+# To run this script, you must:
+#   - Sign up for an AWS S3 account
+#   - Have access to the relevant AWS S3 buckets
+#   - Set up your AWS CLI environment (http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-set-up.html)
+
 cat << "EOF"
 
 ________                .__                     __________
@@ -16,11 +27,6 @@ EOF
 
 # set "fail on error" in bash
 set -e
-
-# To run this script, you must:
-#   - Sign up for an AWS S3 account
-#   - Have access to the relevant AWS S3 buckets
-#   - Set up your AWS CLI environment (http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-set-up.html)
 
 red='\033[1;31m'
 green='\033[1;32m'
