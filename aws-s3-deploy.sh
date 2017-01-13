@@ -23,7 +23,7 @@ ________                .__                     __________
 EOF
 
 # debugging
-set -x
+#set -x
 
 # set "fail on error" in bash
 set -e
