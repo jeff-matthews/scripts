@@ -24,7 +24,7 @@ ________                .__                     __________
 EOF
 
 # debugging
-set -x
+# set -x
 
 # set "fail on error" in bash
 set -e
@@ -98,21 +98,24 @@ echo -e ${white}"Do you want to deploy files from your local file system? Enter 
 select yn in "Yes" "No"; do
   case $yn in
     Yes)
-    echo -e ${yellow}"Uploading the contents of the current local directory to your personal S3 staging environment..."
     if [ "$environment" = "personal" ]; then
       # deploy all local files from the current directory to your personal directory on the S3 staging bucket
-      echo -n "Enter the name of your personal s3 directory and press [ENTER]: "
+      echo -e ${white}"Enter the name of your personal s3 directory and press [ENTER]: "
       read name
+      echo -e ${yellow}"Uploading the contents of the current local directory to your personal S3 staging environment..."
       # pass the s3 path ($name) to the aws s3 sync command
-      aws s3 sync . $personal/$name/ --dryrun;
+      aws s3 sync . $personal/$name/ --exclude ".git/" --dryrun;
       echo -e ${green}"Deployment complete!"
     elif [ "$environment" = "staging" ]; then
+      echo -e ${yellow}"Uploading the contents of the current local directory to the main S3 staging environment..."
       # deploy all local files from the current directory to staging
-      aws s3 sync . $staging/ --dryrun;
+      aws s3 sync . $staging/ --exclude ".git/" --dryrun;
       echo -e ${green}"Deployment complete!"
+      exit
     else [ "$environment" = "production" ]
+      echo -e ${yellow}"Uploading the contents of the current local directory to the S3 production environment..."
       # deploy all local files from the current directory to production
-      aws s3 sync . $production/ --dryrun;
+      aws s3 sync . $production/ --exclude ".git/" --dryrun;
       echo -e ${green}"Deployment complete!"
     fi
     break;;
@@ -123,27 +126,31 @@ select yn in "Yes" "No"; do
         Yes)
         if [ "$environment" = "personal" ]; then
           # specify which directory to copy FROM
-          echo -n ${white}"Enter the name of the s3 directory you want to copy files FROM and press [ENTER]: " ${cyan}
+          echo -e ${white}"Enter the name of the s3 directory you want to copy files FROM and press [ENTER]: " ${cyan}
           read custom
           # specify which directory to copy TO
-          echo -n ${white}"Enter the name of the s3 directory you want to copy files TO and press [ENTER]: " ${cyan}
+          echo -e ${white}"Enter the name of the s3 directory you want to copy files TO and press [ENTER]: " ${cyan}
           read name
           # copy files from the custom directory to the personal directory
-          aws s3 sync s3://docs.magedevteam.com/$custom/ s3://docs.magedevteam.com/$name/ --dryrun;
+          aws s3 sync s3://docs.magedevteam.com/$custom/ s3://docs.magedevteam.com/$name/ --exclude ".git/" --dryrun;
+          echo -e ${green}"Deployment complete!"
+          exit
         else [ "$environment" = "staging" ]
           # specify which directory to copy from
-          echo -n ${white}"Enter the name of the s3 directory you want to copy files FROM and press [ENTER]: " ${cyan}
+          echo -e ${white}"Enter the name of the s3 directory you want to copy files FROM and press [ENTER]: " ${cyan}
           read custom
           # copy files from the custom directory to the staging directory
-          aws s3 sync s3://docs.magedevteam.com/$custom/ $staging/ --dryrun;
+          aws s3 sync s3://docs.magedevteam.com/$custom/ $staging/ --exclude ".git/" --dryrun;
+          exit
         fi
         break;;
         No)
         echo -n -e ${white}"Enter the name of the s3 directory you want to deploy to production and press [ENTER]: " ${cyan}
         read custom
         # copy files from the custom directory to the production directory
-        aws s3 sync s3://docs.magedevteam.com/$custom/ $production/ --dryrun;
-        break;;  
+        aws s3 sync s3://docs.magedevteam.com/$custom/ $production/ --exclude ".git/" --dryrun;
+        echo -e ${green}"Deployment complete!"
+        exit 
       esac
     done
   esac
