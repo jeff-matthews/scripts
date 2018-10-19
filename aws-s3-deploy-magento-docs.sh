@@ -2,14 +2,13 @@
 
 # This script automates the following steps:
 #   1. Prompt user to choose an environment (e.g., personal, staging, production).
-#   2. Prompt user to choose a version (e.g., 2.0, 2.1, 2.2).
-#   3. Prompt user to choose a guide (e.g., CE, EE, B2B).
 #   4. Copy files between environments based on choices.
 
 # To run this script, you must:
 #   - Generate AWS S3 access keys
 #   - Download and install the AWS CLI tool
 #   - Configure your AWS CLI tool with your AWS access keys
+#   - Download this script https://github.com/jeff-matthews/scripts/blob/master/aws-s3-deploy-magento-docs.sh
 # See https://wiki.corp.magento.com/display/MERCHDOCS/Working+with+S3.
 
 cat << "EOF"
@@ -41,60 +40,20 @@ white='\033[1;37m'
 # Choose an environment# 
 ########################
 echo -e ${white}"Which environment do you want to deploy?" ${cyan}
-  select environment in "personal" "staging" "production"; do
+  select environment in "personal" "staging"; do
     case $environment in
       personal) personal="s3://docs.magedevteam.com"
       break;;
-      staging) staging="s3://docs.magedevteam.com/staging"
+      staging) staging="s3://docs.magedevteam.com"
       break;;
-      production) production="s3://docs.magento.com"
-      break;;
-      *) echo -e ${red}Invalid option! Enter 1, 2, or 3.
+      *) echo -e ${red}Invalid option! Enter 1 or 2.
     esac
   done 
-
-# ####################
-# # Choose a version # 
-# ####################
-# echo -e ${white}"Which version do you want to deploy?" ${cyan}
-#   select version in 2.0 2.1 2.2; do
-#     case $version in
-#       2.0) twoo="2.0"
-#       break;;
-#       2.1) twoone="2.1"
-#       break;;
-#       2.2) twotwo="/"
-#       break;;
-#       *) echo -e ${red}Invalid option! Enter 1, 2, or 3.
-#     esac
-#   done
-
-# ##################
-# # Choose a Guide # 
-# ##################
-# echo -e ${white}"Which guide do you want to deploy?" ${cyan}
-#   select guide in CE EE B2B; do
-#     case $guide in
-#       CE) CE="ce"
-#       break;;
-#       EE) EE="ee"
-#       break;;
-#       B2B) B2B="b2b"
-#       break;;
-#       *) echo -e ${red}Invalid option! Enter 1, 2, or 3.
-#     esac
-#   done
-
-# # Test
-# if [ "$environment" = "personal" ] && [ "$version" = "twotwo" ]; then
-#   aws s3 ls $personal/$version/$guide/;
-# fi
-# break
 
 ##############################
 # Choose a deployment method #
 ##############################
-echo -e ${white}"Do you want to deploy files from your local file system? Enter "No" to copy files between s3 directories/buckets." ${cyan}
+echo -e ${white}"Do you want to deploy files from your local file system? Choose "No" to copy files between s3 directories/buckets." ${cyan}
 select yn in "Yes" "No"; do
   case $yn in
     Yes)
@@ -104,32 +63,28 @@ select yn in "Yes" "No"; do
       read name
       echo -e ${yellow}"Uploading the contents of the current local directory to your personal S3 staging environment..."
       # pass the s3 path ($name) to the aws s3 sync command
-      aws s3 sync . $personal/$name/ --exclude ".git/" --dryrun;
-      echo -e ${green}"Deployment complete!"
-    elif [ "$environment" = "staging" ]; then
-      echo -e ${yellow}"Uploading the contents of the current local directory to the main S3 staging environment..."
-      # deploy all local files from the current directory to staging
-      aws s3 sync . $staging/ --exclude ".git/" --dryrun;
+      aws s3 sync . $personal/$name/ --dryrun;
       echo -e ${green}"Deployment complete!"
       exit
-    else [ "$environment" = "production" ]
-      echo -e ${yellow}"Uploading the contents of the current local directory to the S3 production environment..."
-      # deploy all local files from the current directory to production
-      aws s3 sync . $production/ --exclude ".git/" --dryrun;
+    else [ "$environment" = "staging" ];
+      echo -e ${yellow}"Uploading the contents of the current local directory to the main S3 staging environment..."
+      # deploy all local files from the current directory to staging
+      aws s3 sync . $staging/ --dryrun;
       echo -e ${green}"Deployment complete!"
+      exit
     fi
     break;;
     No)
-    echo -e ${white}"Do you want to copy files between directories on staging? Enter "No" to deploy production." ${cyan}
+    echo -e ${white}"Do you want to copy files between directories on staging?" ${cyan}
     select list in "Yes" "No"; do
       case $list in
         Yes)
         if [ "$environment" = "personal" ]; then
           # specify which directory to copy FROM
-          echo -e ${white}"Enter the name of the s3 directory you want to copy files FROM and press [ENTER]: " ${cyan}
+          echo -e ${white}"Enter the S3 SOURCE directory and press [ENTER]: " ${cyan}
           read custom
           # specify which directory to copy TO
-          echo -e ${white}"Enter the name of the s3 directory you want to copy files TO and press [ENTER]: " ${cyan}
+          echo -e ${white}"Enter the S3 DESTINATION directory and press [ENTER]: " ${cyan}
           read name
           # copy files from the custom directory to the personal directory
           aws s3 sync s3://docs.magedevteam.com/$custom/ s3://docs.magedevteam.com/$name/ --exclude ".git/" --dryrun;
@@ -137,20 +92,16 @@ select yn in "Yes" "No"; do
           exit
         else [ "$environment" = "staging" ]
           # specify which directory to copy from
-          echo -e ${white}"Enter the name of the s3 directory you want to copy files FROM and press [ENTER]: " ${cyan}
+          echo -e ${white}"Enter the S3 SOURCE directory and press [ENTER]: " ${cyan}
           read custom
           # copy files from the custom directory to the staging directory
-          aws s3 sync s3://docs.magedevteam.com/$custom/ $staging/ --exclude ".git/" --dryrun;
+          aws s3 sync s3://docs.magedevteam.com/$custom/ $staging/ --dryrun;
           exit
         fi
         break;;
         No)
-        echo -n -e ${white}"Enter the name of the s3 directory you want to deploy to production and press [ENTER]: " ${cyan}
-        read custom
-        # copy files from the custom directory to the production directory
-        aws s3 sync s3://docs.magedevteam.com/$custom/ $production/ --exclude ".git/" --dryrun;
-        echo -e ${green}"Deployment complete!"
-        exit 
+        echo -n ${red}"Error: Production deployment logic disabled. You must copy files between directories on staging or from your local file system. Exiting... " ${cyan}
+        exit 1
       esac
     done
   esac
