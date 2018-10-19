@@ -36,7 +36,7 @@ echo -e "Which environment do you want to deploy?"
     case $environment in
       personal) personal="s3://docs.magedevteam.com"
       break;;
-      staging) staging="s3://docs.magedevteam.com"
+      staging) staging="s3://docs.magedevteam.com/staging"
       break;;
       *) echo -e "Invalid option! Enter 1 or 2."
     esac
@@ -61,7 +61,7 @@ select yn in "Yes" "No"; do
     else [ "$environment" = "staging" ];
       echo -e "Uploading the contents of the current local directory to the main S3 staging environment..."
       # deploy all local files from the current directory to staging
-      aws s3 sync . $staging/ --dryrun;
+      aws s3 sync . "$staging" --dryrun;
       echo -e "Deployment complete!"
       exit
     fi
