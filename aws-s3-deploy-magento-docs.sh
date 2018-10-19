@@ -23,84 +23,76 @@ ________                .__                     __________
 EOF
 
 # debugging
-# set -x
+set -x
 
 # set "fail on error" in bash
 set -e
 
-red='\033[1;31m'
-green='\033[1;32m'
-yellow='\033[1;33m'
-purple='\033[1;34m'
-magenta='\033[1;35m'
-cyan='\033[1;36m'
-white='\033[1;37m'
-
 ########################
 # Choose an environment# 
 ########################
-echo -e ${white}"Which environment do you want to deploy?" ${cyan}
+echo -e "Which environment do you want to deploy?"
   select environment in "personal" "staging"; do
     case $environment in
       personal) personal="s3://docs.magedevteam.com"
       break;;
       staging) staging="s3://docs.magedevteam.com"
       break;;
-      *) echo -e ${red}Invalid option! Enter 1 or 2.
+      *) echo -e "Invalid option! Enter 1 or 2."
     esac
   done 
 
 ##############################
 # Choose a deployment method #
 ##############################
-echo -e ${white}"Do you want to deploy files from your local file system? Choose "No" to copy files between s3 directories/buckets." ${cyan}
+echo -e "Do you want to deploy files from your local file system? Choose 'No' to copy files between s3 directories."
 select yn in "Yes" "No"; do
   case $yn in
     Yes)
     if [ "$environment" = "personal" ]; then
       # deploy all local files from the current directory to your personal directory on the S3 staging bucket
-      echo -e ${white}"Enter the name of your personal s3 directory and press [ENTER]: "
-      read name
-      echo -e ${yellow}"Uploading the contents of the current local directory to your personal S3 staging environment..."
+      echo -e "Enter the name of your personal s3 directory and press [ENTER]: "
+      read -r name
+      echo -e "Uploading the contents of the current local directory to your personal S3 staging environment..."
       # pass the s3 path ($name) to the aws s3 sync command
-      aws s3 sync . $personal/$name/ --dryrun;
-      echo -e ${green}"Deployment complete!"
+      aws s3 sync . "$personal"/"$name"/ --dryrun;
+      echo -e "Deployment complete!"
       exit
     else [ "$environment" = "staging" ];
-      echo -e ${yellow}"Uploading the contents of the current local directory to the main S3 staging environment..."
+      echo -e "Uploading the contents of the current local directory to the main S3 staging environment..."
       # deploy all local files from the current directory to staging
       aws s3 sync . $staging/ --dryrun;
-      echo -e ${green}"Deployment complete!"
+      echo -e "Deployment complete!"
       exit
     fi
     break;;
     No)
-    echo -e ${white}"Do you want to copy files between directories on staging?" ${cyan}
+    echo -e "Do you want to copy files between directories on staging?"
     select list in "Yes" "No"; do
       case $list in
         Yes)
         if [ "$environment" = "personal" ]; then
           # specify which directory to copy FROM
-          echo -e ${white}"Enter the S3 SOURCE directory and press [ENTER]: " ${cyan}
-          read custom
+          echo -e "Enter the S3 SOURCE directory and press [ENTER]: "
+          read -r custom
           # specify which directory to copy TO
-          echo -e ${white}"Enter the S3 DESTINATION directory and press [ENTER]: " ${cyan}
-          read name
+          echo -e "Enter the S3 DESTINATION directory and press [ENTER]: "
+          read -r name
           # copy files from the custom directory to the personal directory
-          aws s3 sync s3://docs.magedevteam.com/$custom/ s3://docs.magedevteam.com/$name/ --exclude ".git/" --dryrun;
-          echo -e ${green}"Deployment complete!"
+          aws s3 sync "s3://docs.magedevteam.com/$custom/" "s3://docs.magedevteam.com/$name/" --dryrun;
+          echo -e "Deployment complete!"
           exit
         else [ "$environment" = "staging" ]
           # specify which directory to copy from
-          echo -e ${white}"Enter the S3 SOURCE directory and press [ENTER]: " ${cyan}
-          read custom
+          echo -e "Enter the S3 SOURCE directory and press [ENTER]: "
+          read -r custom
           # copy files from the custom directory to the staging directory
-          aws s3 sync s3://docs.magedevteam.com/$custom/ $staging/ --dryrun;
+          aws s3 sync "s3://docs.magedevteam.com/$custom/" "$staging/" --dryrun;
           exit
         fi
         break;;
         No)
-        echo -n ${red}"Error: Production deployment logic disabled. You must copy files between directories on staging or from your local file system. Exiting... " ${cyan}
+        echo -n "Error: Production deployment logic disabled. You must copy files between directories on staging or from your local file system. Exiting... "
         exit 1
       esac
     done
