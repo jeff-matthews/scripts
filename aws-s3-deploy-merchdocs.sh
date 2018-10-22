@@ -55,13 +55,13 @@ select yn in "Yes" "No"; do
       read -r name
       echo -e "Uploading the contents of the current local directory to your personal S3 staging environment..."
       # pass the s3 path ($name) to the aws s3 sync command
-      aws s3 sync . "$personal"/"$name"/ --dryrun;
+      aws s3 sync . "$personal"/"$name"/ --exclude "aws-s3-deploy-merchdocs.sh" --exclude "*.git/*";
       echo -e "Deployment complete!"
       exit
     else [ "$environment" = "staging" ];
       echo -e "Uploading the contents of the current local directory to the main S3 staging environment..."
       # deploy all local files from the current directory to staging
-      aws s3 sync . "$staging" --dryrun;
+      aws s3 sync . "$staging" --exclude "aws-s3-deploy-merchdocs.sh"  --exclude "*.git/*";
       echo -e "Deployment complete!"
       exit
     fi
@@ -90,7 +90,7 @@ select yn in "Yes" "No"; do
           echo -e "Enter the S3 DESTINATION directory (no slashes) and press [ENTER]: "
           read -r name
           # copy files from the custom directory to the personal directory
-          aws s3 sync "s3://docs.magedevteam.com/$custom/" "s3://docs.magedevteam.com/$name/" --dryrun;
+          aws s3 sync "s3://docs.magedevteam.com/$custom/" "s3://docs.magedevteam.com/$name/";
           echo -e "Deployment complete!"
           exit
         else [ "$environment" = "staging" ]
@@ -109,7 +109,7 @@ select yn in "Yes" "No"; do
           echo -e "Enter the S3 SOURCE directory (no slashes) and press [ENTER]: "
           read -r custom
           # copy files from the custom directory to the staging directory
-          aws s3 sync "s3://docs.magedevteam.com/$custom/" "$staging/" --dryrun;
+          aws s3 sync "s3://docs.magedevteam.com/$custom/" "$staging/";
           exit
         fi
         break;;
