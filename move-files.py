@@ -1,14 +1,19 @@
 #!/usr/bin/env python
 
-import os
-import fnmatch
-import shutil
+import os, fnmatch, shutil
 
+#  Binaries to filter
 binaries = ['*.psd', '*.ai', '*.pdf', '*.zip', '*.sketch']
 
-for root, dirnames, filenames in os.walk("/Users/jeffmatthews/git/magento/devdocs/src/"):
+# Source path
+source = '/Users/jeffmatthews/git/magento/devdocs/src/'
+  
+# Destination path
+destination = '/Users/jeffmatthews/Desktop/dest/'
+
+for root, dirnames, filenames in os.walk(source):
     for extensions in binaries:
         for filename in fnmatch.filter(filenames, extensions):
-            # matches.append(os.path.join(root, filename))
-            # matches.append(os.path.abspath(os.getcwd())
-            print(os.path.join(root, filename))
+            print (os.path.join(root, filename))
+            print (os.path.join(destination, filename))
+            shutil.move(os.path.join(root, filename), os.path.join(destination, filename))
