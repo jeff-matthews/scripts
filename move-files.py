@@ -2,8 +2,8 @@
 
 import os, fnmatch, shutil
 
-#  Binaries to filter
-binaries = ['*.psd', '*.ai', '*.pdf', '*.zip', '*.sketch']
+#  Pattern to filter
+files = ['*.psd', '*.ai', '*.pdf', '*.zip', '*.sketch']
 
 # Source path
 source = '/Users/jeffmatthews/git/magento/devdocs/src/'
@@ -12,7 +12,7 @@ source = '/Users/jeffmatthews/git/magento/devdocs/src/'
 destination = '/Users/jeffmatthews/Desktop/dest/'
 
 for root, dirnames, filenames in os.walk(source):
-    for extensions in binaries:
+    for extensions in files:
         for filename in fnmatch.filter(filenames, extensions):
             print (os.path.join(root, filename))
             print (os.path.join(destination, filename))
