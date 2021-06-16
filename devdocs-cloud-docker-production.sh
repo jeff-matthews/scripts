@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-MAGENTO_VERSION=2.4.1
-CLOUD_DOCKER_VERSION=1.1.2
+MAGENTO_VERSION=2.3.7
+CLOUD_DOCKER_VERSION=1.2.2
 PHP=7.4
 
 echo 'Preparing for installation'
