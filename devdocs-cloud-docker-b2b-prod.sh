@@ -1,10 +1,11 @@
 #!/bin/bash
-set -e
+set -ex
 
-B2B=1.3.0
-CLOUD_DOCKER_VERSION=1.1.2
-MAGENTO_VERSION=2.4.1
-PHP=7.4
+MAGENTO_VERSION=2.4.3
+B2B=1.3.2
+CLOUD_DOCKER_VERSION=1.2.4
+
+# PHP=7.4
 
 echo 'Preparing for installation'
 
@@ -12,25 +13,20 @@ if [ -d "magento-cloud-${MAGENTO_VERSION}" ]
 then
     cd magento-cloud-${MAGENTO_VERSION}
 
-    echo "Clearing existing template"
-    rm -rf vendor composer.lock var/log/*
-
     echo 'Clearing existing projects'
     docker-compose down --volume
 
-    echo 'Pruning Docker resources'
-    docker system prune --force --all
+    echo "Clearing existing template"
+    rm -rf vendor composer.lock var/log/*
+
+    # echo 'Pruning Docker resources'
+    # docker system prune --force --all
 else
     echo 'Starting official procedure from Step 1 (https://devdocs.magento.com/cloud/docker/docker-mode-production.html)'
 
     echo "Downloading a template for Magento ${MAGENTO_VERSION}"
-    wget -nc https://github.com/magento/magento-cloud/archive/${MAGENTO_VERSION}.zip
 
-    echo "Unarchiving"
-    unzip -o ${MAGENTO_VERSION}
-
-    echo "Removing the archive"
-    rm ${MAGENTO_VERSION}.zip
+    git clone --branch ${MAGENTO_VERSION} git@github.com:magento/magento-cloud.git magento-cloud-${MAGENTO_VERSION}
 
     cd magento-cloud-${MAGENTO_VERSION}
 
@@ -49,13 +45,10 @@ echo 'Adding B2B extension'
 composer require magento/extension-b2b:${B2B} --no-update
 
 echo 'Updating dependencies'
-composer update
-
-echo 'Installing the template dependencies and add the default hostname to your /etc/hosts file'
-curl https://raw.githubusercontent.com/magento/magento-cloud-docker/${CLOUD_DOCKER_VERSION}/bin/init-docker.sh | bash -s -- --php ${PHP}
+COMPOSER_MEMORY_LIMIT=-1 composer update
 
 echo 'Start the Docker configuration generator'
-./vendor/bin/ece-docker build:compose --php ${PHP}
+./vendor/bin/ece-docker build:compose
 
 echo 'Build files to containers and run in the background'
 docker-compose up --detach
@@ -82,3 +75,5 @@ docker-compose run --rm deploy magento-command cache:clean
 
 echo 'Access the local Magento Cloud template'
 open http://magento2.docker
+open http://magento2.docker/admin
+open http://magento2.docker:8025/
