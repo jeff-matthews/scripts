@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Define an array containing a list of files to download
+# Loop through the array and download each corresponding file using wget
+
 fileList=(
     'Image_Video_Uploader.psd'
     'Magento-icon-library.ai'
