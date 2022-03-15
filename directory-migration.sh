@@ -17,8 +17,9 @@ white='\033[1;37m'
 echo -e ${white}"Enter the full path to the working directory."
 read dir
 cd $dir
-echo -e ${yellow}"The working directory is $dir."
-echo -e ${cyan}"Renaming all files in the working directory 'index.md'."
+count=$(find . -name '*.md' | wc -l)
+echo -e ${yellow}"The working directory is $dir and contains $count .md files."
+echo -e ${cyan}"Renaming $count .md files in the working directory 'index.md'."
 
 for file in **/*.md *.md;
 
@@ -28,4 +29,4 @@ do
   mv $file $dir/index.md;
 done
 
-echo -e ${green}"File renaming complete!"
+echo -e ${green}"Successfully renamed $count .md files."
