@@ -7,13 +7,6 @@ read dir
 cd $dir
 
 echo "Changed to $dir"
- 
-# for file in *.md;
-
-# do
-#   mkdir -- "${file%.md}";
-#   mv -- "$file" "${file%.md}";
-# done
 
 for file in **/*.md *.md;
 
