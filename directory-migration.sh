@@ -1,7 +1,12 @@
 #!/bin/sh
+
+# debugging
+set -x
+
+# set "fail on error" in bash
 set -e
 
-echo “Enter dir”
+echo -e ${white}"Enter the full path to the working directory." ${cyan}
 read dir
  
 cd $dir
