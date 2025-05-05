@@ -6,13 +6,13 @@ import sys
 from pathlib import Path
 
 def add_edition_frontmatter(file_path):
-    """Add edition: pass to frontmatter if it doesn't exist."""
+    """Add edition: paas to frontmatter if it doesn't exist."""
     with open(file_path, 'r', encoding='utf-8') as f:
         content = f.read()
     
     # Check if file already has edition: pass
-    if 'edition: pass' in content:
-        print(f"Skipping {file_path} - already has edition: pass")
+    if 'edition: paas' in content:
+        print(f"Skipping {file_path} - already has edition: paas")
         return
     
     # Check if file has frontmatter
@@ -21,14 +21,14 @@ def add_edition_frontmatter(file_path):
         print(f"Skipping {file_path} - no frontmatter found")
         return
     
-    # Add edition: pass to frontmatter
+    # Add edition: paas to frontmatter
     frontmatter = frontmatter_match.group(1)
-    new_frontmatter = f"{frontmatter}\nedition: pass"
+    new_frontmatter = f"{frontmatter}\nedition: paas"
     new_content = content.replace(frontmatter, new_frontmatter)
     
     with open(file_path, 'w', encoding='utf-8') as f:
         f.write(new_content)
-    print(f"Added edition: pass to {file_path}")
+    print(f"Added edition: paas to {file_path}")
 
 def process_directory(directory):
     """Process all markdown files in directory and its subdirectories."""
