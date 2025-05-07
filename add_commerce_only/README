@@ -1,0 +1,45 @@
+# Add CommerceOnly Component Script
+
+This script adds the CommerceOnly import and component above the first h1 heading in all Markdown files within a specified directory and its subdirectories.
+
+## What the Script Does
+
+For each Markdown file in the specified directory and its subdirectories, the script:
+1. Checks if the CommerceOnly import is already present
+2. If not present, finds the first h1 heading in the file
+3. Adds the following content above the first h1:
+   ```markdown
+   import CommerceOnly from '/src/_includes/commerce-only.md'
+
+   <CommerceOnly />
+   ```
+
+## Usage
+
+```bash
+python add_commerce_only.py <directory_path>
+```
+
+### Example
+
+```bash
+python add_commerce_only.py ./commerce-webapi/src/pages
+```
+
+## Behavior
+
+- The script will skip files that already contain the CommerceOnly import
+- Files without an h1 heading will be skipped
+- The script processes all `.md` files in the specified directory and its subdirectories
+- The script preserves all existing content in the files
+
+## Requirements
+
+- Python 3.x
+- No additional Python packages required
+
+## Notes
+
+- Make sure to back up your files before running the script
+- The script will modify files in place
+- The script will print status messages for each file it processes
